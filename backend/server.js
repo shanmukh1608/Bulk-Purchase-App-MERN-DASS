@@ -24,7 +24,12 @@ connection.once('open', function() {
 // Getting all the users
 
 customerRoute = require('./routes/customer');
+vendorRoute = require('./routes/vendor');
+loginRoute = require('./routes/login');
+
 app.use('/customer', customerRoute);
+app.use('/vendor', vendorRoute);
+app.use('/login', loginRoute);
 
 // // Getting a user by id
 // userRoutes.route('/:id').get(function(req, res) {
