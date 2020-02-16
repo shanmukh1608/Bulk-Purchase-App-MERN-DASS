@@ -21,8 +21,7 @@ let ProductSchema = new mongoose.Schema({
 	},
 	vendorid: { 
 		type: mongoose.Schema.Types.ObjectId, 
-		ref:'Vendor'
+		ref:'User'
 	}
 });
-
 module.exports = mongoose.model('Product', ProductSchema);

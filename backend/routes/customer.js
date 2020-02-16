@@ -1,5 +1,5 @@
 const router = require('express').Router();
-let Customer = require('../models/customer.model');
+let Customer = require('../models/user.model');
 
 // Adding a new customer
 router.route('/add').post(function(req, res) {
@@ -15,7 +15,7 @@ router.route('/add').post(function(req, res) {
 
 // Getting all customers
 router.route('/').get(function (req, res) {
-	Customer.find(function (err, users) {
+	Customer.find({ isVendor: false }, function (err, users) {
 		if (err) {
 			console.log(err);
 		} else {

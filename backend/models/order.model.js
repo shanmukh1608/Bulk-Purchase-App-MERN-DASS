@@ -12,7 +12,7 @@ let OrderSchema = new mongoose.Schema({
 	},
 	customerid: { 
 		type: mongoose.Schema.Types.ObjectId, 
-		ref:'Customer'
+		ref:'User'
 	}
 });
 

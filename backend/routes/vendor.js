@@ -1,22 +1,21 @@
 const router = require('express').Router();
-let Vendor = require('../models/vendor.model');
+let Vendor = require('../models/user.model');
 
 // Adding a new vendor
 router.route('/add').post(function(req, res) {
-    let vendor = new Vendor(req.body);
-    vendor.save()
-        .then(vendor => {
-            res.status(200).json({'Vendor': 'Vendor added successfully'});
-        })
-        .catch(err => {
-            res.status(400).send('Error');
-        });
+	let vendor = new Vendor(req.body);
+	vendor.save()
+		.then(vendor => {
+			res.status(200).json({'Vendor': 'Vendor added successfully'});
+		})
+		.catch(err => {
+			res.status(400).send('Error');
+		});
 });
 
 // Getting all vendors
 router.route('/').get(function (req, res) {
-	Vendor.find(function (err, users) {
-        console.log("test");
+	Vendor.find({ isVendor: true }, function (err, users) {
 		if (err) {
 			console.log(err);
 		} else {
