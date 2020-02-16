@@ -61,8 +61,8 @@ router.route('/add').post(verifyToken, function (req, res) {
 });
 
 // Getting all orders
-router.route('/').get(async function (req, res) {
-    await Order.find({}).lean().exec(async function (err, orders) {
+router.route('/').get(function (req, res) {
+    Order.find({}).lean().exec(function (err, orders) {
         if (err) console.log(err);
         else {
             res.json(orders);
