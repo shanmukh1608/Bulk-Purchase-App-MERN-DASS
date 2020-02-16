@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 let Vendor = require('../models/vendor.model');
 let Customer = require('../models/customer.model');
 
-
 // Login for vendor
 router.route('/vendor').post(function (req, res) {
     let username = req.body.username;
@@ -20,8 +19,13 @@ router.route('/vendor').post(function (req, res) {
             user.comparePasswords(password, function (err, match) {
                 if (err) return res.status(400).json({ error: 'Sorry, our hampsters are on break!' });
                 if (match) {
-                    res.send("Match")
                     // User is verified
+                    // res.send("Match")
+                    jwt.sign({ user }, 'secretkey', (err, token) => {
+                        res.json({
+                            token
+                        });
+                    })
                     // res.send({ token: getWebToken(user) });
                 } else {
                     return res.status(400).json({ error: 'Incorrect Username or Password' });
