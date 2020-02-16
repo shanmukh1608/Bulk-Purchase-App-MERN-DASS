@@ -4,14 +4,14 @@ const jwt = require('jsonwebtoken');
 let User = require('../models/user.model');
 
 // Login for vendor
-router.route('/vendor').post(function (req, res) {
+router.route('/vendor').post(async function (req, res) {
 	let username = req.body.username;
 	let password = req.body.password;
 
 	if (!username || !password) {
 		return res.status(400).json({ error: 'Missing user information' });
 	} else {
-		User.findOne({ isVendor: true, username: username }, function (err, user) {
+		await User.findOne({ isVendor: true, username: username }, function (err, user) {
 			if (err) return res.status(400).json({ error: 'Error' });
 			if (!user) return res.status(400).json({ error: 'Sorry, no user found!' });
 

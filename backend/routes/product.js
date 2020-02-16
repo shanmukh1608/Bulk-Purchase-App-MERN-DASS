@@ -25,10 +25,10 @@ function verifyToken(req, res, next) {
 
 // Adding a new product
 router.route('/add').post(verifyToken, function (req, res) {
-	jwt.verify(req.token, 'secretkey', (err, authData) => {
+	jwt.verify(req.token, 'secretkey', async (err, authData) => {
 		if (err) return res.sendStatus(402);
 		else {
-			User.findOne({ isVendor: true, _id: authData.user._id }, function (err, user) {
+			await User.findOne({ isVendor: true, _id: authData.user._id }, function (err, user) {
 				if (err) return res.sendStatus(400);
 				if (!user) return res.status(400).json({ error: 'Current user is not a vendor' });
 
@@ -49,9 +49,9 @@ router.route('/add').post(verifyToken, function (req, res) {
 });
 
 // Getting all products for particular vendor
-router.route('/vendor').get(async function (req, res) {
-	inputVendorID = req.header.vendorid;
-	await Product.find({ vendorid: inputVendorID }).lean().exec(async function (err, products) {
+router.route('/vendor').get(function (req, res) {
+	let inputVendorid = req.headers.vendorid;
+	Product.find({ vendorid: inputVendorid }).lean().exec(async function (err, products) {
 		if (err) console.log(err);
 		else {
 			for (let i = 0; i < products.length; i++) {
@@ -73,8 +73,8 @@ router.route('/vendor').get(async function (req, res) {
 });
 
 // Getting all products
-router.route('/').get(async function (req, res) {
-	await Product.find({}).lean().exec(async function (err, products) {
+router.route('/').get(function (req, res) {
+	Product.find({}).lean().exec(async function (err, products) {
 		if (err) console.log(err);
 		else {
 			for (let i = 0; i < products.length; i++) {

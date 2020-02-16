@@ -27,12 +27,13 @@ customerRoute = require('./routes/customer');
 vendorRoute = require('./routes/vendor');
 loginRoute = require('./routes/login');
 productRoute = require('./routes/product');
-	
+orderRoute = require('./routes/order')
+
 app.use('/customer', customerRoute);
 app.use('/vendor', vendorRoute);
 app.use('/login', loginRoute);
 app.use('/product', productRoute);
-
+app.use('/order', orderRoute);
 
 // // Getting a user by id
 // userRoutes.route('/:id').get(function(req, res) {
