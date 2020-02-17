@@ -30,6 +30,7 @@ router.route('/add').post(verifyToken, function (req, res) {
     jwt.verify(req.token, 'secretkey', (err, authData) => {
         if (err) return console.log("error")
         else {
+            // if logged in user is a vendor
             User.findOne({ isVendor: false, _id: authData.user._id }).lean().exec(function (err, user) {
                 if (err) return console.log("error")
                 if (!user) return res.status(400).json({ error: 'Current user is not a customer' });
@@ -37,24 +38,30 @@ router.route('/add').post(verifyToken, function (req, res) {
                 req.body.customerid = user._id; //userid retrieved from authToken
                 req.body.productid = req.headers.productid; //productid retrieved through headers
 
-                // if logged in user is a vendor
                 let order = new Order(req.body);
                 order.save()
                     .catch(err => {
-                        res.status(400).send('Error updating Order database');
+                        return res.status(400).send('Error updating Order database');
                     })
 
-                Product.findByIdAndUpdate(order.productid, { $inc: { remaining: -1 * order.quantity } }, function (err, product) {
-                    if (err) console.log("Error")
+                Product.findById(order.productid, function (err, product) {
+                    if (err) return res.status(500).send("Error")
                     else {
-                        if (product.remaining <= order.quantity) {
-                            Product.findByIdAndUpdate(order.productid, { status: "placed" }, function (err, product) {
-                                if (err) res.status(400).send('Error changing status')
-                                res.status(200).send("Succesfully placed order")
-                            });
+                        if (order.quantity > product.remaining) res.status(400).send("More quantity requested than available")
+                        else {
+                            product.remaining = product.remaining - order.quantity;
+                            if (product.remaining <= 0) product.status = "Placed"
+
+                            product.save()
+                                .then(product => {
+                                    res.status(200).send("Successfully ordered")
+                                })
+                                .catch(err => {
+                                    if (err) res.status(500).send("Error saving updated quantity in database")
+                                });
                         }
                     }
-                });
+                })
             });
         }
     })
