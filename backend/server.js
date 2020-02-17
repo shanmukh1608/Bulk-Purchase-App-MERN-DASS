@@ -13,7 +13,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Connection to mongodb
-mongoose.connect('mongodb://127.0.0.1:27017/users', { useNewUrlParser: true });
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
+
+mongoose.connect('mongodb://127.0.0.1:27017/users');
 const connection = mongoose.connection;
 connection.once('open', function() {
 	console.log("MongoDB database connection established succesfully.");
