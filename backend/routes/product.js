@@ -2,7 +2,15 @@ const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 
 let Product = require('../models/product.model');
+let Review = require('../models/review.model');
+let Order = require('../models/order.model')
 let User = require('../models/user.model');
+
+/*
+APIs
+List a new product - works
+View all products - works
+*/
 
 function verifyToken(req, res, next) {
 	// Get auth header value
@@ -48,30 +56,6 @@ router.route('/add').post(verifyToken, function (req, res) {
 	})
 });
 
-// Getting all products for particular vendor
-router.route('/vendor').get(function (req, res) {
-	let inputVendorid = req.headers.vendorid;
-	Product.find({ vendorid: inputVendorid }).lean().exec(async function (err, products) {
-		if (err) console.log(err);
-		else {
-			for (let i = 0; i < products.length; i++) {
-				let index = 0;
-				await User.findOne({ isVendor: true, _id: products[i].vendorid }, function (err, vendor) {
-					if (err) res.sendStatus(400);
-					if (!vendor) return res.status(400).json({ error: 'Vendor not found' });
-
-					index = i
-					name = vendor.username
-				});
-
-				products[index].vendorname = name;
-			}
-
-			res.json(products);
-		}
-	});
-});
-
 // Getting all products
 router.route('/').get(function (req, res) {
 	Product.find({}).lean().exec(async function (err, products) {
@@ -93,6 +77,6 @@ router.route('/').get(function (req, res) {
 			res.json(products);
 		}
 	});
-});
+});	
 
 module.exports = router;

@@ -8,7 +8,7 @@ let ProductSchema = new mongoose.Schema({
 	},
 	status: { 
 		type: String, 
-		default:'waiting', 
+		default:'Waiting', 
 		trim: true 
 	},
 	price: { 

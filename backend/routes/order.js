@@ -1,10 +1,16 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 
-let Product = require('../models/product.model');
 let User = require('../models/user.model');
-let Order = require('../models/order.model');
+let Product = require('../models/product.model');
+let Review = require('../models/review.model');
+let Order = require('../models/order.model')
 
+/*
+APIs
+Place order - works
+View all orders - works
+*/
 
 function verifyToken(req, res, next) {
     // Get auth header value
@@ -28,7 +34,7 @@ function verifyToken(req, res, next) {
 // Placing a new order
 router.route('/add').post(verifyToken, function (req, res) {
     jwt.verify(req.token, 'secretkey', (err, authData) => {
-        if (err) return console.log("error")
+        if (err) return res.status(500).send("Error")
         else {
             // if logged in user is a vendor
             User.findOne({ isVendor: false, _id: authData.user._id }).lean().exec(function (err, user) {
@@ -36,7 +42,7 @@ router.route('/add').post(verifyToken, function (req, res) {
                 if (!user) return res.status(400).json({ error: 'Current user is not a customer' });
 
                 req.body.customerid = user._id; //userid retrieved from authToken
-                req.body.productid = req.headers.productid; //productid retrieved through headers
+                req.body.productid = req.body.productid; //productid retrieved through headers
 
                 let order = new Order(req.body);
                 order.save()
@@ -69,7 +75,7 @@ router.route('/add').post(verifyToken, function (req, res) {
 
 // Getting all orders
 router.route('/').get(function (req, res) {
-    Order.find({}).lean().exec(function (err, orders) {
+    Order.find(function (err, orders) {
         if (err) console.log(err);
         else {
             res.json(orders);
