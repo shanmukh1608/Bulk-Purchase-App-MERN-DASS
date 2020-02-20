@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css"
 
 import UsersList from './components/users-list.component'
-import CreateUser from './components/create-user.component'
+import Register from './components/registration.component'
 
 
 function App() {
@@ -18,15 +18,15 @@ function App() {
                 <Link to="/" className="nav-link">Users</Link>
               </li>
               <li className="navbar-item">
-                <Link to="/create" className="nav-link">Create User</Link>
-              </li>
+                <Link to="/register" className="nav-link">Register</Link>
+              </li> 
             </ul>
           </div>
         </nav>
 
         <br/>
         <Route path="/" exact component={UsersList}/>
-        <Route path="/create" component={CreateUser}/>
+        <Route path="/register" component={Register}/>
       </div>
     </Router>
   );
