@@ -1,23 +1,19 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-// import Button from 'react-bootstrap/Button'
-// import ButtonGroup from 'react-bootstrap/ButtonGroup'
-// import ToggleButton from 'react-bootstrap/ToggleButton'
+import { Redirect } from 'react-router-dom';
 
-export default class Register extends Component {
+export default class Login extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
             username: '',
-            password: '',
-            isVendor: false
+            password: ''
         }
 
         this.onChangeUsername = this.onChangeUsername.bind(this);
         this.onChangePassword = this.onChangePassword.bind(this);
-        this.onChangeUserType = this.onChangeUserType.bind(this);
 
         this.onSubmit = this.onSubmit.bind(this);
     }
@@ -30,38 +26,50 @@ export default class Register extends Component {
         this.setState({ password: event.target.value });
     }
 
-    onChangeUserType(event) {
-        this.setState({ isVendor: true });
-    }
-
     onSubmit(e) {
         e.preventDefault();
 
         const newUser = {
             username: this.state.username,
-            password: this.state.password,
-            isVendor: this.state.isVendor
+            password: this.state.password
         }
 
-        if (newUser.isVendor) {
-            axios.post('http://localhost:4000/vendor/add', newUser)
-                .then(res => console.log(res.data));
+        if (newUser) {
+            axios.post('http://localhost:4000/login', newUser)
+                .then(res => {
+                    if (res.data.error)
+                        alert(res.data.error)
+                    else {
+                        localStorage.setItem("token", res.data.token);
+                        if (!res.data.type)
+                            localStorage.setItem("type", "C");
+                        else
+                            localStorage.setItem("type", "V");
+
+                        console.log(localStorage.getItem("type"))
+                        window.location.reload()
+                    }
+                });
         }
-        else {
-            axios.post('http://localhost:4000/customer/add', newUser)
-                .then(res => console.log(res.data));
-        }
+
 
         this.setState({
             username: '',
-            password: '',
-            isVendor: false
+            password: ''
         });
+    }
+
+    loginRedirect() {
+        if (localStorage.getItem("type") == "C")
+            return <Redirect to = "/customer" />
+        else if (localStorage.getItem("type") == "V")
+            return <Redirect to = "/vendor" />
     }
 
     render() {
         return (
             <div>
+                {this.loginRedirect()}
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group">
                         <label>Username: </label>
@@ -71,6 +79,7 @@ export default class Register extends Component {
                             onChange={this.onChangeUsername}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Password: </label>
                         <input type="password"
@@ -79,19 +88,10 @@ export default class Register extends Component {
                             onChange={this.onChangePassword}
                         />
                     </div>
-                    <div className="btn btn-primary">
-                        <label>Register as a vendor: &nbsp; </label>
-                        <input type="checkbox"
-                            className="btn btn-primary"
-                            defaultChecked={false}
-                            value={this.state.isVendor}
-                            onChange={this.onChangeUserType}
-                        />
-                    </div>
                     <hr></hr>
 
                     <div className="form-group">
-                        <input type="submit" value="Create User" className="btn btn-primary" />
+                        <input type="submit" value="Login" className="btn btn-primary" />
                     </div>
                 </form>
             </div>

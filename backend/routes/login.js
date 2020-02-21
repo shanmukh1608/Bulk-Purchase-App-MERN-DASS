@@ -30,28 +30,28 @@ function verifyToken(req, res, next) {
 }
 
 // Login for vendor
-router.route('/vendor').post(async function (req, res) {
+router.route('/').post(async function (req, res) {
 	let username = req.body.username;
 	let password = req.body.password;
 
 	if (!username || !password) {
-		return res.status(400).json({ error: 'Missing user information' });
+		return json({ error: 'Missing user information' });
 	} else {
-		await User.findOne({ isVendor: true, username: username }, function (err, user) {
-			if (err) return res.status(400).json({ error: 'Error' });
-			if (!user) return res.status(400).json({ error: 'Sorry, no user found!' });
+		await User.findOne({ username: username }, function (err, user) {
+			if (err) return res.json({ error: 'Error' });
+			if (!user) return res.json({ error: 'Sorry, no user found!' });
 
 			user.comparePasswords(password, function (err, match) {
-				if (err) return res.status(400).json({ error: 'Error' });
+				if (err) return res.json({ error: 'Error' });
 				if (match) {
 					// User is verified
 					jwt.sign({ user }, 'secretkey', (err, token) => {
 						res.json({
-							token
+							token, type: user.isVendor
 						});
 					})
 				} else {
-					return res.status(400).json({ error: 'Incorrect Username or Password' });
+					return res.json({ error: 'Incorrect Username or Password' });
 				}
 			});
 
@@ -59,56 +59,22 @@ router.route('/vendor').post(async function (req, res) {
 	}
 });
 
+// router.route('/check').get(verifyToken, function (req, res) {
+// 	console.log(req.token)
+// 	jwt.verify(req.token, 'secretkey', (err, authData) => {
+// 		if (err) return res.status(500).json({"Error" : "Error occurred"})
+// 		else
+// 		{
+// 			let token = req.token;
+// 			User.findOne({_id: authData.user._id }).lean().exec(function (err, user) {
+// 				if (err) return res.status(500).send("Error")
+// 				if (!user) return res.status(400).send("Error")
 
-// Login for customer
-router.route('/customer').post(function (req, res) {
-	let username = req.body.username;
-	let password = req.body.password;
-
-	if (!username || !password) {
-		return res.status(400).json({ error: 'Missing user information' });
-	} else {
-
-		User.findOne({ isVendor: false, username: username }, function (err, user) {
-			if (err) return res.status(400).json({ error: 'Error' });
-			if (!user) return res.status(400).json({ error: 'Sorry, no user found!' });
-
-			user.comparePasswords(password, function (err, match) {
-				if (err) return res.status(400).json({ error: 'Error' });
-
-				if (match) {
-					// User is verified
-					jwt.sign({ user }, 'secretkey', (err, token) => {
-						res.json({
-							token
-						});
-					})
-				} else {
-					return res.status(400).json({ error: 'Incorrect Username or Password' });
-				}
-			});
-
-		});
-	}
-});
-
-router.route('/check').get(verifyToken, function (req, res) {
-	console.log("AAA")
-	console.log(req.token)
-	jwt.verify(req.token, 'secretkey', (err, authData) => {
-		if (err) return res.status(500).json({"Error" : "Error occurred"})
-		else
-		{
-			let token = req.token;
-			User.findOne({_id: authData.user._id }).lean().exec(function (err, user) {
-				if (err) return res.status(500).send("Error")
-				if (!user) return res.status(400).send("Error")
-
-				return res.status(200).send(user.isVendor)
-			})
-		}
-	})
-});
+// 				return res.status(200).send(user.isVendor)
+// 			})
+// 		}
+// 	})
+// });
 
 
 module.exports = router;

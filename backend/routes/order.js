@@ -42,8 +42,6 @@ router.route('/add').post(verifyToken, function (req, res) {
                 if (!user) return res.status(400).json({ error: 'Current user is not a customer' });
 
                 req.body.customerid = user._id; //userid retrieved from authToken
-                req.body.productid = req.body.productid; //productid retrieved through headers
-
                 let order = new Order(req.body);
                 order.save()
                     .catch(err => {

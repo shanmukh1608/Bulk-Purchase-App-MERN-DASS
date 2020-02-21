@@ -61,19 +61,6 @@ router.route('/').get(function (req, res) {
 	Product.find({}).lean().exec(async function (err, products) {
 		if (err) console.log(err);
 		else {
-			for (let i = 0; i < products.length; i++) {
-				let index = 0;
-				await User.findOne({ isVendor: true, _id: products[i].vendorid }, function (err, vendor) {
-					if (err) console.log(err);
-					if (!vendor) return res.status(400).json({ error: 'Vendor not found' });
-
-					index = i
-					name = vendor.username
-				});
-
-				products[index].vendorname = name;
-			}
-
 			res.json(products);
 		}
 	});

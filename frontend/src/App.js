@@ -4,7 +4,11 @@ import "bootstrap/dist/css/bootstrap.min.css"
 
 import UsersList from './components/users-list.component'
 import Register from './components/registration.component'
-
+import Login from './components/login.component'
+import Customer from './components/customer.component'
+import Search from './components/searchProducts.component'
+import vendorReviews from './components/vendorReviews.component'
+import viewOrders from './components/viewOrders.component'
 
 function App() {
   return (
@@ -20,13 +24,25 @@ function App() {
               <li className="navbar-item">
                 <Link to="/register" className="nav-link">Register</Link>
               </li> 
+              <li className="navbar-item">
+                <Link to="/login" className="nav-link">Login</Link>
+              </li> 
             </ul>
           </div>
         </nav>
 
         <br/>
-        <Route path="/" exact component={UsersList}/>
-        <Route path="/register" component={Register}/>
+        <Route path="/dashboard" exact component={UsersList}/>
+        <Route path="/users" exact component={UsersList}/>
+        <Route path="/register" exact component={Register}/>
+        <Route path="/login" exact component={Login}/>
+        <Route path="/customer" exact component={Customer}/>
+        <Route path="/searchProducts" exact component={Search}/>
+        {/* <Route path="/vendorReviews" exact component={vendorReviews}/> */}
+        <Route path="/viewOrders" exact component={viewOrders}/>
+
+
+
       </div>
     </Router>
   );
