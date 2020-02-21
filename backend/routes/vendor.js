@@ -61,19 +61,20 @@ router.route('/').get(function (req, res) {
 
 // Getting all products for particular vendor
 router.route('/product').get(verifyToken, function (req, res) {
+	// console.log("aaa")
 	jwt.verify(req.token, 'secretkey', (err, authData) => {
-		if (err) res.status(500).send('Error authenticating');
+		if (err) res.send('Error authenticating');
 		else {
 			Vendor.findOne({ isVendor: true, _id: authData.user._id }).lean().exec(function (err, vendor) { //checks vendor
-				if (err) res.status(500).send('Error authenticating');
+				if (err) res.send('Error authenticating');
 				else {
-					if (!vendor) res.status(500).send('User logged in is not a vendor');
+					if (!vendor) res.send('User logged in is not a vendor');
 					let inputVendorid = vendor._id;
-					Product.find({ vendorid: inputVendorid, status: { $ne: "Placed" } }).lean().exec(async function (err, products) {
-						if (err) res.status(500).send('Error retrieving products');
+					Product.find({ vendorid: inputVendorid, status: "Waiting"}).lean().exec(async function (err, products) {
+						if (err) res.send('Error retrieving products');
 						else {
 							if (!products)
-								res.status(400).send('No product found');
+								res.send('No product found');
 
 							// for (let i = 0; i < products.length; i++) {
 							// 	let index = 0;
@@ -122,13 +123,13 @@ router.route('/cancel').post(function (req, res) {
 // View orders ready to dispatch
 router.route('/viewPlaced').get(verifyToken, function (req, res) {
 	jwt.verify(req.token, 'secretkey', (err, authData) => {
-		if (err) res.status(500).send('Error authenticating');
+		if (err) res.send('Error authenticating');
 		else {
 			Vendor.findOne({ isVendor: true, _id: authData.user._id }).lean().exec(function (err, vendor) { //checks vendor
-				if (err) res.status(500).send('Error authenticating');
+				if (err) res.send('Error authenticating');
 				else {
 					Product.find({ vendorid: vendor._id, status: "Placed" }, async function (err, products) {
-						if (err) return res.status(500).send("Error")
+						if (err) return res.send("Error")
 						else {
 							if (!products)
 								res.status(400).send('No products found');
@@ -150,19 +151,19 @@ router.route('/dispatch').post(function (req, res) {
 		if (err) return res.status(500).send("Error")
 		else {
 			if (!product)
-				res.status(400).send('No product found');
+				res.json({error: 'No product found'});
 
 			if (product.remaining <= 0)
 				product.status = "Dispatched";
 			else
-				res.status(400).send("Can't dispatch yet");
+				res.json({error: "Can't dispatch yet"});
 
 			product.save()
 				.then(product => {
-					res.status(200).send('Dispatched product');
+					res.send('Dispatched product');
 				})
 				.catch(err => {
-					if (err) res.status(500).send("Error dispatching product")
+					if (err) res.json({error:"Error dispatching product"})
 				});
 		}
 	});

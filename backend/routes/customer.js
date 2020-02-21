@@ -39,13 +39,13 @@ function verifyToken(req, res, next) {
 // Adding a new customer
 router.route('/add').post(function (req, res) {
     let customer = new Customer(req.body);
-    console.log(req.body)
+    // console.log(req.body)
     customer.save()
         .then(customer => {
             res.status(200).json({ 'Customer': 'Customer added successfully' });
         })
         .catch(err => {
-            console.log(err)
+            // console.log(err)
             res.status(400).send('Error');
         });
 });
@@ -54,7 +54,7 @@ router.route('/add').post(function (req, res) {
 router.route('/').get(function (req, res) {
     Customer.find({ isVendor: false }, function (err, users) {
         if (err) {
-            console.log(err);
+            // console.log(err);
         } else {
             res.json(users);
         }
@@ -78,9 +78,9 @@ router.route('/search').get(verifyToken, function (req, res) {
                 let inputFilter = req.query.filter;
                 let inputSort = req.query.sort;
 
-                console.log(inputString, inputFilter, inputSort);
+                // console.log(inputString, inputFilter, inputSort);
 
-                Product.find({ name: inputString }).lean().exec(async function (err, products) {
+                Product.find({ name: inputString, status: { $ne: "Canceled" } }).lean().exec(async function (err, products) {
                     if (err) return res.json({ error: 'Error retrieving products' });
                     if (!products) return res.json({ error: 'No products found' });
 
@@ -165,33 +165,42 @@ router.route('/search').get(verifyToken, function (req, res) {
     })
 });
 
-// body contains vendorID
+// query contains vendorID
 router.route('/vendorReviews').get(function (req, res) {
-    Product.find({ vendorid: req.query.vendorid }, async function (err, products) {
+    Product.find({ vendorid: req.query.vendorid }).lean().exec(async function (err, products) {
         if (err) return res.status(500).send("Error")
         else {
             if (!products)
                 res.status(400).send('No products found');
+            else {
+                for (let i = 0; i < products.length; i++) {
+                    let index = 0, count = 0, reviewsToAdd = [];
 
-            for (let i = 0; i < products.length; i++) {
-                let index = 0, count = 0, reviewsToAdd = [];
-                await Order.find({ productid: products[i]._id }, async function (err, orders) {
-                    if (err) return res.status(500).send("Error querying database")
-                    if (!orders) return res.status(400).json({ error: 'Orders not found' });
+                    await Order.find({ productid: products[i]._id }, async function (err, orders) {
+                        if (err) return res.status(500).send("Error querying database")
+                        else {
+                            if (!orders) return res.status(400).json({ error: 'Orders not found' });
+                            else {
+                                for (let j = 0; j < orders.length; j++) {
+                                    await Review.find({ orderid: orders[j]._id }, function (err, reviews) {
+                                        if (err) return res.status(500).send("Error querying database")
+                                        else {
+                                            if (!reviews) return res.status(400).json({ error: 'Reviews not found' });
+                                            else {
+                                                console.log("Oh hey")
+                                                index = 
+                                                reviewsToAdd.push(reviews)
+                                                count = count + 1
+                                            }
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    });
 
-                    for (let j = 0; j < orders.length; j++) {
-                        await Review.find({ orderid: orders[i]._id }, function (err, reviews) {
-                            if (err) return res.status(500).send("Error querying database")
-                            if (!reviews) return res.status(400).json({ error: 'Reviews not found' });
-
-                            index = i
-                            reviewsToAdd[count] = Review.reviews
-                            count = count + 1
-                        })
-                    }
-                });
-
-                products[index].vendorname = reviewsToAdd;
+                    products[index].reviews = reviewsToAdd;
+                }
             }
             res.json(products);
         }
@@ -207,53 +216,54 @@ router.route('/orders').get(verifyToken, function (req, res) {
                 if (err) res.json({ error: 'Error authenticating' });
                 else {
                     if (!customer) res.json({ error: 'User logged in is not a customer!' });
-                    Order.find({ customerid: customer._id }).lean().exec(async function (err, orders) {
-                        if (err) res.json({ error: 'Error retrieving orders' });
-                        else {
-                            if (!orders) {
-                                console.log("Nothing")
-                                res.json({ error: 'No product found' });
-                            }
+                    else
+                        Order.find({ customerid: customer._id }).lean().exec(async function (err, orders) {
+                            if (err) res.json({ error: 'Error retrieving orders' });
+                            else {
+                                if (!orders) {
+                                    // console.log("Nothing")
+                                    res.json({ error: 'No product found' });
+                                }
 
-                            for (let i = 0; i < orders.length; i++) {
-                                let name, index = 0, remainingRequired = 0;
-                                let index2 = 0, vendorname;
+                                for (let i = 0; i < orders.length; i++) {
+                                    let name, index = 0, remainingRequired = 0;
+                                    let index2 = 0, vendorname;
 
-                                await Product.findOne({ _id: orders[i].productid }, async function (err, product) {
-                                    if (err) return res.sendStatus(400);
-                                    if (!product) return res.json({ error: 'Vendor not found' });
-
-                                    index = i
-                                    name = product.name
-                                    status = product.status
-                                    remainingRequired = product.remaining
-
-
-                                    await Customer.findOne({ isVendor: true, _id: product.vendorid }).lean().exec(function (err, vendor) {
+                                    await Product.findOne({ _id: orders[i].productid }, async function (err, product) {
                                         if (err) return res.sendStatus(400);
-                                        if (!vendor) return res.json({ error: 'Vendor not found' });
+                                        if (!product) return res.json({ error: 'Vendor not found' });
 
-                                        vendorname = vendor.username
+                                        index = i
+                                        name = product.name
+                                        status = product.status
+                                        remainingRequired = product.remaining
+
+
+                                        await Customer.findOne({ isVendor: true, _id: product.vendorid }).lean().exec(function (err, vendor) {
+                                            if (err) return res.sendStatus(400);
+                                            if (!vendor) return res.json({ error: 'Vendor not found' });
+
+                                            vendorname = vendor.username
+                                        });
                                     });
-                                });
 
-                                await Product.findOne({ _id: orders[i].productid }, async function (err, product) {
-                                });
+                                    await Product.findOne({ _id: orders[i].productid }, async function (err, product) {
+                                    });
 
-                                orders[index].name = name;
-                                orders[index].status = status;
+                                    orders[index].name = name;
+                                    orders[index].status = status;
 
-                                if (orders[index].status == "waiting")
-                                    orders[index].remainingRequired = remainingRequired
+                                    if (orders[index].status == "waiting")
+                                        orders[index].remainingRequired = remainingRequired
 
-                                // console.log(vendorname)
+                                    // console.log(vendorname)
 
-                                orders[index].vendorname = vendorname;
+                                    orders[index].vendorname = vendorname;
+                                }
+
+                                res.json(orders);
                             }
-
-                            res.json(orders);
-                        }
-                    });
+                        });
                 }
             })
         }
@@ -318,8 +328,9 @@ router.route('/editOrder').post(verifyToken, function (req, res) {
 });
 
 router.route('/rateVendor').post(function (req, res) {
-    // body contains vendorID, rating (0-5)
-    Customer.findOne({ isVendor: true, _id: req.body.vendorid }, function (err, vendor) {
+    // body contains vendor username, rating (0-5)
+    // console.log(req.body.vendorname)
+    Customer.findOne({ isVendor: true, username: req.body.vendorname }, function (err, vendor) {
         if (err) res.status(500).send('Error finding vendor');
         else {
             if (!vendor) res.status(400).send('No such vendor');

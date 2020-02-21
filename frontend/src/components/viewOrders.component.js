@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import axios from 'axios';
 // import CustomerNavbar from "./user-navbar.component"
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button'
-
+import Modal from 'react-bootstrap/Modal'
 
 export default class viewOrders extends Component {
 
@@ -50,6 +50,9 @@ export default class viewOrders extends Component {
                             <th>Status</th>
                             <th>Vendor</th>
                             <th>Edit</th>
+                            <th>Rate<br></br>Vendor</th>
+                            <th>Review <br></br>and rate<br></br> product</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -62,7 +65,33 @@ export default class viewOrders extends Component {
                                             <td>{Order.quantity} </td>
                                             <td>{Order.status} </td>
                                             <td>{Order.vendorname} </td>
-                                            <td ><Link to={{ pathname: '/edit', state: { 'id': Order._id } }}>Edit</Link></td>
+                                            <td ><Link to={{ pathname: '/editOrder', state: { 'id': Order._id } }}>Edit</Link></td>
+                                            <td></td>
+                                            <td></td>
+
+                                        </tr>
+                                    )
+                                else if (Order.status == "Placed")
+                                    return (
+                                        <tr key={i}>
+                                            <td>{Order.name}</td>
+                                            <td>{Order.quantity} </td>
+                                            <td>{Order.status} </td>
+                                            <td>{Order.vendorname} </td>
+                                            <td></td>
+                                            <td ><Link to={{ pathname: '/rateVendor', state: { 'vendorname': Order.vendorname } }}> Rate </Link></td>
+                                        </tr>
+                                    )
+                                else if (Order.status == "Dispatched")
+                                    return (
+                                        <tr key={i}>
+                                            <td>{Order.name}</td>
+                                            <td>{Order.quantity} </td>
+                                            <td>{Order.status} </td>
+                                            <td>{Order.vendorname} </td>
+                                            <td></td>
+                                            <td ><Link to={{ pathname: '/rateVendor', state: { 'vendorname': Order.vendorname } }}>Rate</Link></td>
+                                            <td ><Link to={{ pathname: '/reviewOrder', state: { 'id': Order._id } }}>Review</Link></td>
                                         </tr>
                                     )
 

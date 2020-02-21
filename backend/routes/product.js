@@ -38,18 +38,19 @@ router.route('/add').post(verifyToken, function (req, res) {
 		else {
 			await User.findOne({ isVendor: true, _id: authData.user._id }, function (err, user) {
 				if (err) return res.sendStatus(400);
-				if (!user) return res.status(400).json({ error: 'Current user is not a vendor' });
+				if (!user) return res.json({ error: 'Current user is not a vendor' });
 
 				req.body.vendorid = user._id;
 
 				// if logged in user is a vendor
 				let product = new Product(req.body);
+				console.log(req.body)
 				product.save()
 					.then(product => {
-						res.status(200).json({ 'Product': 'Product added successfully' });
+						res.json({ 'Product': 'Product added successfully' });
 					})
 					.catch(err => {
-						res.status(400).send('Error');
+						res.json({error: 'Error'});
 					})
 			})
 		}

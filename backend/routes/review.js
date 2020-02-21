@@ -17,10 +17,10 @@ router.route('/reviewOrder').post(function (req, res) {
     let review = new Review(req.body);
     review.save()
         .then(review => {
-            res.status(200).send("Review added successfully");
+            res.json({ 'status': "Review added successfully" });
         })
         .catch(err => {
-            res.status(400).send('Error');
+            res.json({ 'error': 'Error' });
         });
 })
 

@@ -54,7 +54,6 @@ export default class Search extends Component {
             .then(res => {
                 if (res.data.error)
                     alert(res.data.error);
-                console.log(res.data);
                 this.setState({ products: res.data });
             })
             .catch(err => {
@@ -138,7 +137,6 @@ export default class Search extends Component {
                     <tbody>
                         {
                             this.state.products.map((Product, i) => {
-                                console.log(Product.vendor);
                                 let left = 0, rating = 0;
                                 if (Product.remaining >= 0)
                                     left = Product.remaining;
@@ -154,7 +152,7 @@ export default class Search extends Component {
                                         <td>{Product.name}</td>
                                         <td>{Product.price} </td>
                                         <td>{left}</td>
-                                        <td><Link to={{ pathname: '/vendor', state: { id: Product.vendorid, name: Product.vendorname } }}>{Product.vendorname} </Link></td>
+                                        <td><Link to={{ pathname: '/vendorReviews', state: { id: Product.vendorid, name: Product.vendorname } }}>{Product.vendorname} </Link></td>
                                         <td>{rating}</td>
                                         {/* <form onSubmit={this.onOrder}> */}
                                         <td><input type="number" min="1" value={this.state.remaining} onChange={this.onChangeQuantity} /> </td>

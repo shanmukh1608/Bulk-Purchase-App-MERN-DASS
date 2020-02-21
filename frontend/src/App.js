@@ -2,13 +2,19 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css"
 
-import UsersList from './components/users-list.component'
 import Register from './components/registration.component'
 import Login from './components/login.component'
 import Customer from './components/customer.component'
 import Search from './components/searchProducts.component'
 import vendorReviews from './components/vendorReviews.component'
 import viewOrders from './components/viewOrders.component'
+import editOrder from './components/editOrder.component'
+import rateVendor from './components/rateVendor.component'
+import reviewOrder from './components/reviewOrder.component'
+import Vendor from './components/vendor.component'
+import listProduct from './components/listProduct.component'
+import viewListings from './components/viewListings.component'
+import readyListings from './components/readyToDispatch.component'
 
 function App() {
   return (
@@ -32,14 +38,19 @@ function App() {
         </nav>
 
         <br/>
-        <Route path="/dashboard" exact component={UsersList}/>
-        <Route path="/users" exact component={UsersList}/>
         <Route path="/register" exact component={Register}/>
         <Route path="/login" exact component={Login}/>
         <Route path="/customer" exact component={Customer}/>
         <Route path="/searchProducts" exact component={Search}/>
-        {/* <Route path="/vendorReviews" exact component={vendorReviews}/> */}
+        <Route path="/vendorReviews" exact component={vendorReviews}/>
         <Route path="/viewOrders" exact component={viewOrders}/>
+        <Route path="/editOrder" exact component={editOrder}/>
+        <Route path="/rateVendor" exact component={rateVendor}/>
+        <Route path="/reviewOrder" exact component={reviewOrder}/>
+        <Route path="/vendor" exact component={Vendor}/>
+        <Route path="/listProduct" exact component={listProduct}/>
+        <Route path="/viewListings" exact component={viewListings}/>
+        <Route path="/readyListings" exact component={readyListings}/>
 
 
 
