@@ -165,47 +165,38 @@ router.route('/search').get(verifyToken, function (req, res) {
     })
 });
 
-// query contains vendorID
 router.route('/vendorReviews').get(function (req, res) {
     Product.find({ vendorid: req.query.vendorid }).lean().exec(async function (err, products) {
         if (err) return res.status(500).send("Error")
         else {
             if (!products)
                 res.status(400).send('No products found');
-            else {
-                for (let i = 0; i < products.length; i++) {
-                    let index = 0, count = 0, reviewsToAdd = [];
 
-                    await Order.find({ productid: products[i]._id }, async function (err, orders) {
-                        if (err) return res.status(500).send("Error querying database")
-                        else {
-                            if (!orders) return res.status(400).json({ error: 'Orders not found' });
-                            else {
-                                for (let j = 0; j < orders.length; j++) {
-                                    await Review.find({ orderid: orders[j]._id }, function (err, reviews) {
-                                        if (err) return res.status(500).send("Error querying database")
-                                        else {
-                                            if (!reviews) return res.status(400).json({ error: 'Reviews not found' });
-                                            else {
-                                                console.log("Oh hey")
-                                                index = 
-                                                reviewsToAdd.push(reviews)
-                                                count = count + 1
-                                            }
-                                        }
-                                    })
-                                }
-                            }
-                        }
-                    });
+            for (let i = 0; i < products.length; i++) {
+                var index = 0, count = 0, reviewsToAdd = [];
+                await Order.find({ productid: products[i]._id }, async function (err, orders) {
+                    if (err) return res.status(500).send("Error querying database")
+                    if (orders == false) return;
 
-                    products[index].reviews = reviewsToAdd;
-                }
+                    for (let j = 0; j < orders.length; j++) {
+
+                        if (typeof orders[j] === "undefined") continue;
+                        await Review.find({ orderid: orders[j]._id }, function (err, reviews) {
+                            if (err) return res.status(500).send("Error querying database")
+                            if (reviews == false) return;
+
+                            reviewsToAdd.push(reviews)
+                        })
+                    }
+                });
+
+                products[i].review = reviewsToAdd;
             }
             res.json(products);
         }
-    })
-});
+    });
+})
+
 
 // Getting all orders for particular customer
 router.route('/orders').get(verifyToken, function (req, res) {

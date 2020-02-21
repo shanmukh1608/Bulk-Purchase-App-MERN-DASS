@@ -43,19 +43,20 @@ router.route('/add').post(verifyToken, function (req, res) {
 
                 req.body.customerid = user._id; //userid retrieved from authToken
                 let order = new Order(req.body);
-                order.save()
-                    .catch(err => {
-                        return res.status(400).send('Error updating Order database');
-                    })
+
 
                 Product.findById(order.productid, function (err, product) {
                     if (err) return res.status(500).send("Error")
                     else {
-                        if (order.quantity > product.remaining) res.status(400).send("More quantity requested than available")
+                        if (order.quantity > product.remaining) res.json({error: 'More quantity requested than available'})
                         else {
                             product.remaining = product.remaining - order.quantity;
                             if (product.remaining <= 0) product.status = "Placed"
 
+                            order.save()
+                                .catch(err => {
+                                    return res.status(400).send('Error updating Order database');
+                                })
                             product.save()
                                 .then(product => {
                                     res.status(200).send("Successfully ordered")
