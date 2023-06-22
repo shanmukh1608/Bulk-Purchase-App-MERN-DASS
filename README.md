@@ -1,66 +1,43 @@
-# MERN Stack Boilerplate
+# Bulk Purchase web-app
 
-## Setup
+## Introduction
+A bulk-purchase shopping web-app built with MERN (MongoDB, Express, React, Node) stack with appropriate functionality for customers and vendors.
 
-#### Node
+## Instructions to Run
 
-For Linux:
-```
-curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-For Mac:
-```
-brew install node
+```(shell)
+cd path/to/directory
 ```
 
-#### MongoDB
-
-Install the community edition [here](https://docs.mongodb.com/manual/installation/#mongodb-community-edition-installation-tutorials).
-
-#### React
-
-```
-npm install -g create-react-app
-```
-
-To create a new React app:
-```
-create-react-app name_of_app
-```
-
-To run the app, cd into the directory and do:
-```
-npm start
-```
-
-## Running the boilerplate
-
-Run Mongo daemon:
+Run Mongo (database):
 ```
 sudo mongod
-```
-Mongo will be running on port 27017.
-
-To create a database:
-```
-mongo
 ``` 
-This will open the mongo shell. Type in ```use users``` to create a new database called users.
 
-Run Express:
-```
+Run Express (backend):
+
+``` 
 cd backend/
 npm install
 npm start
 ```
 
-Run React:
+Run React (frontend):
 ```
-cd frontend
+cd frontend/
 npm install/
 npm start
 ```
-Navigate to localhost:3000/ in your browser.
 
+Navigate to `localhost:3000/` in your browser and start shopping!
+
+## File Breakdown
+Frontend and backend have been divided in their respective folders:
+
+#### Backend
+- In backend, models has all the schemas
+- routes has all the APIs that `server.js` calls
+
+#### Frontend
+- All components are declared in the `src/components` folder
+- They are all routed in `App.js`
